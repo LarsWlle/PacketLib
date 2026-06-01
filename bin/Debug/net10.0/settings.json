@@ -1,6 +1,0 @@
-{
-  "Server": {
-    "Port": 8080
-  },
-  "MaxClients": 100
-}
