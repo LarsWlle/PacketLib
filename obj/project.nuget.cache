@@ -1,8 +1,20 @@
 {
   "version": 2,
-  "dgSpecHash": "tMHGGylcF68=",
+  "dgSpecHash": "O/ZqbJz43WI=",
   "success": true,
   "projectFilePath": "/home/lars/RiderProjects/PacketLib/PacketLib.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "/home/lars/.nuget/packages/microsoft.extensions.configuration/11.0.0-preview.4.26230.115/microsoft.extensions.configuration.11.0.0-preview.4.26230.115.nupkg.sha512",
+    "/home/lars/.nuget/packages/microsoft.extensions.configuration.abstractions/11.0.0-preview.4.26230.115/microsoft.extensions.configuration.abstractions.11.0.0-preview.4.26230.115.nupkg.sha512",
+    "/home/lars/.nuget/packages/microsoft.extensions.configuration.fileextensions/11.0.0-preview.4.26230.115/microsoft.extensions.configuration.fileextensions.11.0.0-preview.4.26230.115.nupkg.sha512",
+    "/home/lars/.nuget/packages/microsoft.extensions.configuration.json/11.0.0-preview.4.26230.115/microsoft.extensions.configuration.json.11.0.0-preview.4.26230.115.nupkg.sha512",
+    "/home/lars/.nuget/packages/microsoft.extensions.fileproviders.abstractions/11.0.0-preview.4.26230.115/microsoft.extensions.fileproviders.abstractions.11.0.0-preview.4.26230.115.nupkg.sha512",
+    "/home/lars/.nuget/packages/microsoft.extensions.fileproviders.physical/11.0.0-preview.4.26230.115/microsoft.extensions.fileproviders.physical.11.0.0-preview.4.26230.115.nupkg.sha512",
+    "/home/lars/.nuget/packages/microsoft.extensions.filesystemglobbing/11.0.0-preview.4.26230.115/microsoft.extensions.filesystemglobbing.11.0.0-preview.4.26230.115.nupkg.sha512",
+    "/home/lars/.nuget/packages/microsoft.extensions.primitives/11.0.0-preview.4.26230.115/microsoft.extensions.primitives.11.0.0-preview.4.26230.115.nupkg.sha512",
+    "/home/lars/.nuget/packages/system.io.pipelines/11.0.0-preview.4.26230.115/system.io.pipelines.11.0.0-preview.4.26230.115.nupkg.sha512",
+    "/home/lars/.nuget/packages/system.text.encodings.web/11.0.0-preview.4.26230.115/system.text.encodings.web.11.0.0-preview.4.26230.115.nupkg.sha512",
+    "/home/lars/.nuget/packages/system.text.json/11.0.0-preview.4.26230.115/system.text.json.11.0.0-preview.4.26230.115.nupkg.sha512"
+  ],
   "logs": []
 }
