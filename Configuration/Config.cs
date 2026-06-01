@@ -7,6 +7,9 @@ public class Config {
     public int Port { get; private set; }
     public int MaxConnections { get; private set; }
 
+    public int ReceiveTimeout { get; private set; }
+    public int SendTimeout { get; private set; }
+
     private const string Path = "settings.json";
 
     public Config() {
@@ -19,6 +22,9 @@ public class Config {
 
         this.Port = Convert.ToInt32(config["Server:Port"]);
         this.MaxConnections = Convert.ToInt32(config["MaxClients"]);
+
+        this.ReceiveTimeout = Convert.ToInt32(config["Server:ReceiveTimeout"]);
+        this.SendTimeout = Convert.ToInt32(config["Server:SendTimeout"]);
     }
 
     private void CreateIfNotExists() {
@@ -26,7 +32,11 @@ public class Config {
 
         var defaults = new {
             Server = new { Port = 8080 },
-            MaxClients = 100
+            MaxClients = 100,
+            Timeouts = new {
+                SendTimeout = 10000,
+                ReceiveTimeout = 10000,
+            }
         };
 
         File.WriteAllText(Config.Path, JsonSerializer.Serialize(defaults, new JsonSerializerOptions { WriteIndented = true }));
