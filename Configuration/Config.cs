@@ -7,14 +7,14 @@ public class Config {
     public int Port { get; private set; }
     public int MaxConnections { get; private set; }
 
-    private const string PATH = "settings.json";
+    private const string Path = "settings.json";
 
     public Config() {
         this.CreateIfNotExists();
 
         IConfigurationRoot config = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile(Config.PATH)
+            .AddJsonFile(Config.Path)
             .Build();
 
         this.Port = Convert.ToInt32(config["Server:Port"]);
@@ -22,13 +22,13 @@ public class Config {
     }
 
     private void CreateIfNotExists() {
-        if (File.Exists(Config.PATH)) return;
+        if (File.Exists(Config.Path)) return;
 
         var defaults = new {
             Server = new { Port = 8080 },
             MaxClients = 100
         };
 
-        File.WriteAllText(Config.PATH, JsonSerializer.Serialize(defaults, new JsonSerializerOptions { WriteIndented = true }));
+        File.WriteAllText(Config.Path, JsonSerializer.Serialize(defaults, new JsonSerializerOptions { WriteIndented = true }));
     }
 }
