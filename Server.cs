@@ -8,6 +8,8 @@ namespace PacketLib;
 public class Server(Func<TcpClient, BaseClient> clientFactory) {
     public Config Config { get; private set; } = new();
     private List<BaseClient> _clients = [];
+    private List<IPacketHandlerLayer> _handleLayers = [];
+    private List<IPacketPackageLayer> _packageLayers = [];
 
     public void Start() {
         TcpListener listener = new(IPAddress.Any, this.Config.Port) {

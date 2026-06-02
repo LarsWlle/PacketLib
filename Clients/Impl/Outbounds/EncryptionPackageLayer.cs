@@ -4,7 +4,7 @@ namespace PacketLib.Clients.Impl.Outbounds;
 
 public class EncryptionPackageLayer : IPacketPackageLayer {
     public int GetPriority() {
-        return int.MinValue;
+        return int.MaxValue;
     }
 
     public byte[] Handle(byte[] packet) {
