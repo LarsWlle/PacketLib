@@ -48,8 +48,8 @@ public abstract class BaseClient {
             }
 
             ushort packetId = transformed.ExtractUShort(4);
-            InboundPacket? packet = this._server.GetInboundPacket(packetId);
-            packet?.Handle(transformed);
+            InboundPacket<BaseClient>? packet = this._server.GetInboundPacket(packetId);
+            packet?.Handle(transformed, this);
         }
     }
 

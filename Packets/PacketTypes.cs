@@ -1,3 +1,5 @@
+using PacketLib.Clients;
+
 namespace PacketLib.Packets;
 
 public abstract class Packet {
@@ -20,6 +22,6 @@ public abstract class OutboundPacket : Packet {
     public abstract byte[] Package();
 }
 
-public abstract class InboundPacket : Packet {
-    public abstract void Handle(byte[] data);
+public abstract class InboundPacket<T> : Packet where T : BaseClient {
+    public abstract void Handle(byte[] data, T client);
 }
