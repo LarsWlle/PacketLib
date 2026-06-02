@@ -2,7 +2,7 @@ using PacketLib.Packets;
 
 namespace PacketLib.Clients.Impl.Outbounds;
 
-public class EncryptionPackageLayer : IPacketPackageLayer {
+public class EncryptionPackageLayer : INetworkLayer {
     public int GetPriority() {
         return int.MaxValue;
     }

@@ -4,19 +4,20 @@ using PacketLib.Packets;
 namespace PacketLib;
 
 public abstract class CommunicationParticipant {
-    private readonly List<IPacketHandlerLayer> _handleLayers = [];
-    private readonly List<IPacketPackageLayer> _packageLayers = [];
+    private readonly List<INetworkLayer> _handleLayers = [];
+    private readonly List<INetworkLayer> _packageLayers = [];
 
-    public IReadOnlyList<IPacketHandlerLayer> HandleLayers => this._handleLayers.AsReadOnly();
+    public IReadOnlyList<INetworkLayer> HandleLayers => this._handleLayers.AsReadOnly();
+    public IReadOnlyList<INetworkLayer> PackageLayers => this._packageLayers.AsReadOnly();
 
     private readonly List<InboundPacket<BaseClient>> _inboundPackets = [];
 
-    public void AddPackageHandler(IPacketPackageLayer handler) {
+    public void AddPackageHandler(INetworkLayer handler) {
         this._packageLayers.Add(handler);
         Logger.Debug($"Added new packet package layer with priority = {handler.GetPriority()}");
     }
 
-    public void AddHandlerLayer(IPacketHandlerLayer handler) {
+    public void AddHandlerLayer(INetworkLayer handler) {
         this._handleLayers.Add(handler);
         Logger.Debug($"Added new packet handler layer with priority = {handler.GetPriority()}");
     }

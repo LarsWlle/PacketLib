@@ -38,7 +38,7 @@ public abstract class BaseClient {
             }
 
             ReadOnlySpan<byte> span = buffer.AsSpan(0, bytesRead);
-            byte[] transformed = this.HandleLayers(span.ToArray());
+            byte[] transformed = this.HandleLayers(this._server.HandleLayers, span.ToArray());
 
             int packetLength = transformed.ExtractInt(0);
 
@@ -53,9 +53,22 @@ public abstract class BaseClient {
         }
     }
 
-    private byte[] HandleLayers(byte[] data) {
-        IReadOnlyList<IPacketHandlerLayer> layers = this._server.HandleLayers.OrderBy(p => p.GetPriority()).ToList();
+    private byte[] HandleLayers(IReadOnlyList<INetworkLayer> layers, byte[] data) {
+        IReadOnlyList<INetworkLayer> sorted = layers.OrderBy(p => p.GetPriority()).ToList();
 
-        return layers.Aggregate(data, (current, layer) => layer.Handle(current));
+        return sorted.Aggregate(data, (current, layer) => layer.Handle(current));
+    }
+
+    public void Send(OutboundPacket packet) {
+        NetworkStream stream = this._tcpClient.GetStream();
+        byte[] result = this.HandleLayers(this._server.PackageLayers, packet.Package());
+
+        byte[] final = [
+            ..(result.Length + 6).ToByteArray(), // + 6 = + 4 (length) + 2 (packet id)
+            ..packet.GetId().ToByteArray(),
+            ..result
+        ];
+
+        stream.Write(final, 0, final.Length);
     }
 }

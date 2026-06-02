@@ -1,6 +1,6 @@
 namespace PacketLib.Clients.Impl.Inbounds;
 
-public class EncryptionHandleLayer : IPacketHandlerLayer {
+public class EncryptionHandleLayer : INetworkLayer {
     public int GetPriority() {
         return int.MinValue;
     }
