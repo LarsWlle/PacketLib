@@ -2,14 +2,17 @@ using System.Net;
 using System.Net.Sockets;
 using PacketLib.Clients;
 using PacketLib.Configuration;
+using PacketLib.Packets;
 
 namespace PacketLib;
 
-public class Server(Func<TcpClient, int, Config, BaseClient> clientFactory) {
+public class Server(Func<TcpClient, int, Server, BaseClient> clientFactory) {
     public Config Config { get; private set; } = new();
     private List<BaseClient> _clients = [];
     private List<IPacketHandlerLayer> _handleLayers = [];
     private List<IPacketPackageLayer> _packageLayers = [];
+
+    private readonly List<InboundPacket> _inboundPackets = [];
 
     private int _lastClientId = 0;
 
@@ -21,6 +24,12 @@ public class Server(Func<TcpClient, int, Config, BaseClient> clientFactory) {
     public void AddHandlerLayer(IPacketHandlerLayer handler) {
         this._handleLayers.Add(handler);
         Logger.Debug($"Added new packet handler layer with priority = {handler.GetPriority()}");
+    }
+
+    public void RegisterInboundPacket(InboundPacket packet) {
+        if (this._inboundPackets.Contains(packet)) {
+            Logger.Fatal($"Packet with id {packet.GetId()} already exists");
+        }
     }
 
     public void Start() {
@@ -43,7 +52,7 @@ public class Server(Func<TcpClient, int, Config, BaseClient> clientFactory) {
             TcpClient tcpClient = listener.AcceptTcpClient();
             int id = ++this._lastClientId;
             Logger.Info($"Client connected, id = {id}");
-            BaseClient client = clientFactory(tcpClient, id, this.Config);
+            BaseClient client = clientFactory(tcpClient, id, this);
             this._clients.Add(client);
         });
     }

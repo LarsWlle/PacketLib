@@ -1,5 +1,6 @@
 using System.Net.Sockets;
 using PacketLib.Configuration;
+using PacketLib.Packets;
 
 namespace PacketLib.Clients;
 
@@ -7,12 +8,13 @@ public abstract class BaseClient {
     public int Id { get; private init; }
     private readonly TcpClient _tcpClient;
     private Task _thread;
-    private readonly Config _config;
+    private readonly Server _server;
 
-    public BaseClient(TcpClient client, int id, Config config) {
+
+    public BaseClient(TcpClient client, int id, Server server) {
         this.Id = id;
         this._tcpClient = client;
-        this._config = config;
+        this._server = server;
 
         this._thread = Task.Run(this.HandleIncomingTraffic);
     }
@@ -26,7 +28,7 @@ public abstract class BaseClient {
                 continue;
             }
 
-            byte[] buffer = new byte[this._config.MaxReadWriteBuffer];
+            byte[] buffer = new byte[this._server.Config.MaxReadWriteBuffer];
             int bytesRead = stream.Read(buffer, 0, buffer.Length);
 
             if (bytesRead == 0) {

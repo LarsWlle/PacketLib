@@ -8,12 +8,12 @@ namespace PacketLib;
 
 class Program {
     static void Main(string[] args) {
-        Server server = new Server(((tcp, id, config) => new Client(tcp, id, config)));
+        Server server = new Server(((tcp, id, s) => new Client(tcp, id, s)));
 
         server.AddHandlerLayer(new EncryptionHandleLayer());
         server.AddPackageHandler(new EncryptionPackageLayer());
         server.Start();
     }
 
-    private class Client(TcpClient client, int id, Config config) : BaseClient(client, id, config);
+    private class Client(TcpClient client, int id, Server server) : BaseClient(client, id, server);
 }
