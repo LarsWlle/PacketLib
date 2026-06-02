@@ -8,7 +8,7 @@ namespace PacketLib;
 
 class Program {
     static void Main(string[] args) {
-        Server server = new Server(((tcp, id, s) => new Client(tcp, id, s)));
+        Server server = new(((tcp, id, s) => new Client(tcp, id, s)));
 
         server.AddHandlerLayer(new EncryptionHandleLayer());
         server.AddPackageHandler(new EncryptionPackageLayer());
