@@ -12,7 +12,7 @@ public abstract class BaseClient {
     private readonly Server _server;
 
 
-    public BaseClient(TcpClient client, int id, Server server) {
+    protected BaseClient(TcpClient client, int id, Server server) {
         this.Id = id;
         this._tcpClient = client;
         this._server = server;
@@ -49,7 +49,7 @@ public abstract class BaseClient {
 
             ushort packetId = transformed.ExtractUShort(4);
             InboundPacket? packet = this._server.GetInboundPacket(packetId);
-            packet.Handle(transformed);
+            packet?.Handle(transformed);
         }
     }
 

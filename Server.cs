@@ -36,7 +36,7 @@ public class Server(Func<TcpClient, int, Server, BaseClient> clientFactory) {
         this._inboundPackets.Add(packet);
     }
 
-    internal InboundPacket GetInboundPacket(ushort id) {
+    internal InboundPacket? GetInboundPacket(ushort id) {
         try {
             return this._inboundPackets.First(p => p.GetId() == id);
         }
