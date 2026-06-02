@@ -36,4 +36,8 @@ public class Server(Func<TcpClient, int, Server, BaseClient> clientFactory) : Co
             this._clients.Add(client);
         });
     }
+
+    public BaseClient GetClient(int id) {
+        return this._clients.First(c => c.Id == id);
+    }
 }
