@@ -9,8 +9,10 @@ namespace PacketLib;
 public class Server(Func<TcpClient, int, Server, BaseClient> clientFactory) {
     public Config Config { get; private set; } = new();
     private List<BaseClient> _clients = [];
-    private List<IPacketHandlerLayer> _handleLayers = [];
-    private List<IPacketPackageLayer> _packageLayers = [];
+    private readonly List<IPacketHandlerLayer> _handleLayers = [];
+    private readonly List<IPacketPackageLayer> _packageLayers = [];
+
+    public IReadOnlyList<IPacketHandlerLayer> HandleLayers => this._handleLayers.AsReadOnly();
 
     private readonly List<InboundPacket> _inboundPackets = [];
 
@@ -29,6 +31,18 @@ public class Server(Func<TcpClient, int, Server, BaseClient> clientFactory) {
     public void RegisterInboundPacket(InboundPacket packet) {
         if (this._inboundPackets.Contains(packet)) {
             Logger.Fatal($"Packet with id {packet.GetId()} already exists");
+        }
+
+        this._inboundPackets.Add(packet);
+    }
+
+    internal InboundPacket GetInboundPacket(ushort id) {
+        try {
+            return this._inboundPackets.First(p => p.GetId() == id);
+        }
+        catch (InvalidOperationException ex) {
+            Logger.Fatal($"Could not find packet with id {id}");
+            return null;
         }
     }
 
