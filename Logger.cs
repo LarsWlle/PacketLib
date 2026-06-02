@@ -27,7 +27,7 @@ internal static class Logger {
     private const string BoldRed = "\e[1;31m";
 
     public static void Log(LogLevel level, string message) {
-        StackFrame frame = new StackFrame(1, false);
+        StackFrame frame = new StackFrame(2, false);
         MethodBase? method = frame.GetMethod();
 
         string source = method?.DeclaringType?.Name ?? "Unknown";

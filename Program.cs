@@ -10,8 +10,8 @@ namespace PacketLib;
 class Program {
     static void Main(string[] args) {
         Program prog = new Program();
+        Task.Run(prog.TestClient);
         prog.TestServer();
-        prog.TestClient();
     }
 
     private void TestServer() {

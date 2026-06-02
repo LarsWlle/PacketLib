@@ -7,8 +7,8 @@ using PacketLib.Packets;
 namespace PacketLib;
 
 public class Server(Func<TcpClient, int, Server, BaseClient> clientFactory) : CommunicationParticipant {
-    public Config Config { get; private set; } = new();
-    private List<BaseClient> _clients = [];
+    public Config Config { get; } = new();
+    private readonly List<BaseClient> _clients = [];
 
     private int _lastClientId = 0;
 
@@ -27,14 +27,13 @@ public class Server(Func<TcpClient, int, Server, BaseClient> clientFactory) : Co
             Logger.Fatal($"Could not start listener. Reason: {ex}");
         }
 
-
-        Task.Run(() => {
+        while (true) {
             TcpClient tcpClient = listener.AcceptTcpClient();
             int id = ++this._lastClientId;
             Logger.Info($"Client connected, id = {id}");
             BaseClient client = clientFactory(tcpClient, id, this);
             this._clients.Add(client);
-        });
+        }
     }
 
     public BaseClient GetClient(int id) {
