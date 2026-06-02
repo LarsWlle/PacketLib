@@ -1,7 +1,7 @@
 namespace PacketLib.Packets;
 
 public interface IPacket {
-    public short GetId();
+    public ushort GetId();
 }
 
 public interface IOutboundPacket : IPacket {
