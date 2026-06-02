@@ -2,6 +2,6 @@ using PacketLib.Packets;
 
 namespace PacketLib.Clients;
 
-public interface IPacketHandlerLayer {
+public interface IPacketHandlerLayer : INetworkLayer {
     IInboundPacket? Handle(IInboundPacket packet);
 }
