@@ -14,7 +14,7 @@ public enum LogLevel {
     Fatal
 }
 
-public static class Logger {
+internal static class Logger {
     private static readonly object Lock = new object();
 
     // ANSI Colors

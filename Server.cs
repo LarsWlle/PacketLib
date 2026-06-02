@@ -5,7 +5,7 @@ using PacketLib.Configuration;
 
 namespace PacketLib;
 
-public class Server(Func<TcpClient, int, BaseClient> clientFactory) {
+public class Server(Func<TcpClient, int, Config, BaseClient> clientFactory) {
     public Config Config { get; private set; } = new();
     private List<BaseClient> _clients = [];
     private List<IPacketHandlerLayer> _handleLayers = [];
@@ -31,13 +31,19 @@ public class Server(Func<TcpClient, int, BaseClient> clientFactory) {
             }
         };
 
-        listener.Start();
+        try {
+            listener.Start();
+        }
+        catch (SocketException ex) {
+            Logger.Fatal($"Could not start listener. Reason: {ex}");
+        }
+
 
         Task.Run(() => {
             TcpClient tcpClient = listener.AcceptTcpClient();
             int id = ++this._lastClientId;
             Logger.Info($"Client connected, id = {id}");
-            BaseClient client = clientFactory(tcpClient, id);
+            BaseClient client = clientFactory(tcpClient, id, this.Config);
             this._clients.Add(client);
         });
     }

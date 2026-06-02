@@ -10,6 +10,8 @@ public class Config {
     public int ReceiveTimeout { get; private set; }
     public int SendTimeout { get; private set; }
 
+    public int MaxReadWriteBuffer { get; private set; }
+
     private const string Path = "settings.json";
 
     public Config() {
@@ -23,8 +25,9 @@ public class Config {
         this.Port = Convert.ToInt32(config["Server:Port"]);
         this.MaxConnections = Convert.ToInt32(config["MaxClients"]);
 
-        this.ReceiveTimeout = Convert.ToInt32(config["Server:ReceiveTimeout"]);
-        this.SendTimeout = Convert.ToInt32(config["Server:SendTimeout"]);
+        this.ReceiveTimeout = Convert.ToInt32(config["Timeouts:ReceiveTimeout"]);
+        this.SendTimeout = Convert.ToInt32(config["Timeouts:SendTimeout"]);
+        this.MaxReadWriteBuffer = Convert.ToInt32(config["MaxReadWriteBuffer"]);
     }
 
     private void CreateIfNotExists() {
@@ -36,7 +39,8 @@ public class Config {
             Timeouts = new {
                 SendTimeout = 10000,
                 ReceiveTimeout = 10000,
-            }
+            },
+            MaxReadWriteBuffer = 2048
         };
 
         File.WriteAllText(Config.Path, JsonSerializer.Serialize(defaults, new JsonSerializerOptions { WriteIndented = true }));
