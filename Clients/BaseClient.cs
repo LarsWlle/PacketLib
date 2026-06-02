@@ -4,5 +4,5 @@ using PacketLib.Configuration;
 namespace PacketLib.Clients;
 
 public abstract class BaseClient {
-    public BaseClient(TcpClient client) { }
+    public BaseClient(TcpClient client, int id) { }
 }

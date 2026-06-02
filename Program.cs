@@ -1,12 +1,18 @@
 ﻿using System.Net.Sockets;
 using PacketLib.Clients;
+using PacketLib.Clients.Impl.Inbounds;
+using PacketLib.Clients.Impl.Outbounds;
 
 namespace PacketLib;
 
 class Program {
     static void Main(string[] args) {
-        new Server(((tcp) => new Client(tcp))).Start();
+        Server server = new Server(((tcp, id) => new Client(tcp, id)));
+
+        server.AddHandlerLayer(new EncryptionHandleLayer());
+        server.AddPackageHandler(new EncryptionPackageLayer());
+        server.Start();
     }
 
-    private class Client(TcpClient client) : BaseClient(client);
+    private class Client(TcpClient client, int id) : BaseClient(client, id);
 }
