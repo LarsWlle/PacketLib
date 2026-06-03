@@ -28,6 +28,7 @@ public abstract class CommunicationParticipant {
         }
 
         this._inboundPackets.Add(packet);
+        Logger.Debug($"Registered new packet[id={packet.GetId()},name\"{packet.GetType().Name}\"]");
     }
 
     internal InboundPacket? GetInboundPacket(ushort id) {
