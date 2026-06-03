@@ -10,7 +10,7 @@ public abstract class CommunicationParticipant {
     public IReadOnlyList<INetworkLayer> HandleLayers => this._handleLayers.AsReadOnly();
     public IReadOnlyList<INetworkLayer> PackageLayers => this._packageLayers.AsReadOnly();
 
-    private readonly List<InboundPacket<BaseClient>> _inboundPackets = [];
+    private readonly List<InboundPacket<ISendableParticipant>> _inboundPackets = [];
 
     public void AddPackageHandler(INetworkLayer handler) {
         this._packageLayers.Add(handler);
@@ -22,7 +22,7 @@ public abstract class CommunicationParticipant {
         Logger.Debug($"Added new packet handler layer with priority = {handler.GetPriority()}");
     }
 
-    public void RegisterInboundPacket(InboundPacket<BaseClient> packet) {
+    public void RegisterInboundPacket(InboundPacket<ISendableParticipant> packet) {
         if (this._inboundPackets.Contains(packet)) {
             Logger.Fatal($"Packet with id {packet.GetId()} already exists");
         }
@@ -30,7 +30,7 @@ public abstract class CommunicationParticipant {
         this._inboundPackets.Add(packet);
     }
 
-    internal InboundPacket<BaseClient>? GetInboundPacket(ushort id) {
+    internal InboundPacket<ISendableParticipant>? GetInboundPacket(ushort id) {
         try {
             return this._inboundPackets.First(p => p.GetId() == id);
         }

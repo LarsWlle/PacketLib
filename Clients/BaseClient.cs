@@ -48,7 +48,7 @@ public abstract class BaseClient : ISendableParticipant {
             }
 
             ushort packetId = transformed.ExtractUShort(4);
-            InboundPacket<BaseClient>? packet = this._server.GetInboundPacket(packetId);
+            InboundPacket<ISendableParticipant>? packet = this._server.GetInboundPacket(packetId);
             packet?.Handle(transformed, this);
         }
     }
