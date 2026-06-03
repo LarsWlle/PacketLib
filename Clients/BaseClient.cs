@@ -5,7 +5,7 @@ using PacketLib.Utils;
 
 namespace PacketLib.Clients;
 
-public abstract class BaseClient {
+public abstract class BaseClient : ISendableParticipant {
     public int Id { get; private init; }
     private readonly TcpClient _tcpClient;
     private Task _thread;

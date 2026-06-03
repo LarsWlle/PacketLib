@@ -5,7 +5,7 @@ using PacketLib.Utils;
 
 namespace PacketLib;
 
-public class CommunicationClient : CommunicationParticipant {
+public class CommunicationClient : CommunicationParticipant, ISendableParticipant {
     private TcpClient _client;
 
     public void Connect(string endpoint, int port) {

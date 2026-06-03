@@ -22,6 +22,6 @@ public abstract class OutboundPacket : Packet {
     public abstract byte[] Package();
 }
 
-public abstract class InboundPacket<T> : Packet where T : BaseClient {
+public abstract class InboundPacket<T> : Packet where T : ISendableParticipant {
     public abstract void Handle(byte[] data, T client);
 }
