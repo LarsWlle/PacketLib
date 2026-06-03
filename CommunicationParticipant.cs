@@ -22,7 +22,7 @@ public abstract class CommunicationParticipant {
         Logger.Debug($"Added new packet handler layer with priority = {handler.GetPriority()}");
     }
 
-    public void RegisterInboundPacket(InboundPacket<ISendableParticipant> packet) {
+    public void RegisterInboundPacket<T>(T packet) where T : InboundPacket<ISendableParticipant> {
         if (this._inboundPackets.Contains(packet)) {
             Logger.Fatal($"Packet with id {packet.GetId()} already exists");
         }
