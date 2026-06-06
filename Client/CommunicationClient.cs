@@ -1,10 +1,8 @@
 using System.Net.Sockets;
-using PacketLib.Clients;
 using PacketLib.Layering;
 using PacketLib.Packets;
-using PacketLib.Utils;
 
-namespace PacketLib;
+namespace PacketLib.Client;
 
 public class CommunicationClient(
     string endpoint,

@@ -1,5 +1,3 @@
-using PacketLib.Clients;
-
 namespace PacketLib.Layering;
 
 public class LayerPipeline {

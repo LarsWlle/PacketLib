@@ -1,11 +1,10 @@
 using System.Net;
 using System.Net.Sockets;
-using PacketLib.Clients;
 using PacketLib.Configuration;
 using PacketLib.Layering;
 using PacketLib.Packets;
 
-namespace PacketLib;
+namespace PacketLib.Server;
 
 public class Server(Func<TcpClient, int, Server, BaseClient> clientFactory) {
     public Config Config { get; } = new();

@@ -1,8 +1,6 @@
 using System.Net.Sockets;
-using PacketLib.Packets;
-using PacketLib.Utils;
 
-namespace PacketLib.Clients;
+namespace PacketLib.Server;
 
 public abstract class BaseClient : AbstractClient {
     public int Id { get; private init; }

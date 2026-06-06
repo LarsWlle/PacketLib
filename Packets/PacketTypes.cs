@@ -1,5 +1,3 @@
-using PacketLib.Clients;
-
 namespace PacketLib.Packets;
 
 public abstract class Packet {
