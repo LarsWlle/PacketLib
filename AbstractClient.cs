@@ -1,0 +1,94 @@
+using System.Net.Sockets;
+using PacketLib.Layering;
+using PacketLib.Packets;
+using PacketLib.Utils;
+
+namespace PacketLib;
+
+/// <summary>
+///     A class that handles read/write of a network buffer,
+///     based on an already created tcp client.
+///     Also contains extra methods that manage this tcp connection.
+/// </summary>
+public abstract class AbstractClient : ISendableParticipant {
+    private readonly TcpClient _client;
+    private readonly LayerPipeline<AbstractClient> _handleLayers;
+    private readonly LayerPipeline<AbstractClient> _packageLayers;
+    private readonly PacketList _packetList;
+    private readonly int _maxReadBufferLength;
+
+    protected AbstractClient(
+        TcpClient client,
+        LayerPipeline<AbstractClient> handleLayers,
+        LayerPipeline<AbstractClient> packageLayers,
+        PacketList inboundPackets,
+        int maxReadBufferLength
+    ) {
+        this._client = client;
+        this._handleLayers = handleLayers;
+        this._packageLayers = packageLayers;
+        this._packetList = inboundPackets;
+        this._maxReadBufferLength = maxReadBufferLength;
+        _ = new Thread(this.HandleIncomingTraffic);
+    }
+
+    private void HandleIncomingTraffic() {
+        NetworkStream stream = this._client.GetStream();
+
+        while (this._client.Connected) {
+            try {
+                if (!stream.CanRead || !stream.DataAvailable) {
+                    Thread.Sleep(10);
+                    continue;
+                }
+
+                byte[] buffer = new byte[this._maxReadBufferLength];
+                int bytesRead = stream.Read(buffer, 0, buffer.Length);
+
+                if (bytesRead == 0) {
+                    Logger.Warn("Data was available but read 0 bytes, something is going on!");
+                    continue;
+                }
+
+                ReadOnlySpan<byte> span = buffer.AsSpan(0, bytesRead);
+                byte[] transformed = this._handleLayers.Perform(span.ToArray());
+
+                int packetLength = transformed.ExtractInt(0);
+
+                if (packetLength != transformed.Length) {
+                    Logger.Warn($"Packet length {packetLength} != {transformed.Length}, discarding packet!");
+                    continue;
+                }
+
+                ushort packetId = transformed.ExtractUShort(4);
+                InboundPacket? packet = this._packetList.Get(packetId);
+                packet?.Handle(transformed, this);
+            }
+            catch (IOException ex) {
+                Logger.Warn(ex.Message);
+                break;
+            }
+        }
+    }
+
+    public void Send(OutboundPacket packet) {
+        NetworkStream stream = this._client.GetStream();
+        byte[] data = packet.Package();
+        byte[] result = this._packageLayers.Perform(data);
+
+        byte[] final = [
+            ..(result.Length + 6).ToByteArray(), // + 6 = + 4 (length) + 2 (packet id)
+            ..packet.GetId().ToByteArray(),
+            ..result
+        ];
+
+        stream.Write(final, 0, final.Length);
+    }
+
+    public void Terminate() {
+        NetworkStream stream = this._client.GetStream();
+        stream.Flush();
+        stream.Close();
+        this._client.Close(); // Should close the thread
+    }
+}

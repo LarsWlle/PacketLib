@@ -1,5 +1,4 @@
 using System.Net.Sockets;
-using PacketLib.Configuration;
 using PacketLib.Packets;
 using PacketLib.Utils;
 
