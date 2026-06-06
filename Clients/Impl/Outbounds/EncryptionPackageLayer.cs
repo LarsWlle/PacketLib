@@ -7,7 +7,7 @@ public class EncryptionPackageLayer : INetworkLayer {
         return int.MaxValue;
     }
 
-    public byte[] Handle(byte[] packet, ISendableParticipant client) {
+    public byte[] Handle(byte[] packet, AbstractClient client) {
         return packet;
     }
 }

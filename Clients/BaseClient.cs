@@ -4,70 +4,13 @@ using PacketLib.Utils;
 
 namespace PacketLib.Clients;
 
-public abstract class BaseClient : ISendableParticipant {
+public abstract class BaseClient : AbstractClient {
     public int Id { get; private init; }
-    private readonly TcpClient _tcpClient;
-    private Task _thread;
     private readonly Server _server;
 
 
-    protected BaseClient(TcpClient client, int id, Server server) {
+    protected BaseClient(TcpClient client, int id, Server server) : base(client, server.HandleLayers, server.PackageLayers, server.InboundPackets, server.Config.MaxReadWriteBuffer) {
         this.Id = id;
-        this._tcpClient = client;
         this._server = server;
-
-        this._thread = Task.Run(this.HandleIncomingTraffic);
-    }
-
-    private void HandleIncomingTraffic() {
-        NetworkStream stream = this._tcpClient.GetStream();
-
-        while (this._tcpClient.Connected) {
-            if (!stream.CanRead || !stream.DataAvailable) {
-                Thread.Sleep(10);
-                continue;
-            }
-
-            byte[] buffer = new byte[this._server.Config.MaxReadWriteBuffer];
-            int bytesRead = stream.Read(buffer, 0, buffer.Length);
-
-            if (bytesRead == 0) {
-                Logger.Warn("Data was available but read 0 bytes, something is going on!");
-                continue;
-            }
-
-            ReadOnlySpan<byte> span = buffer.AsSpan(0, bytesRead);
-            byte[] transformed = this.HandleLayers(this._server.HandleLayers, span.ToArray());
-
-            int packetLength = transformed.ExtractInt(0);
-
-            if (packetLength != transformed.Length) {
-                Logger.Warn($"Packet length {packetLength} != {transformed.Length}, discarding packet!");
-                continue;
-            }
-
-            ushort packetId = transformed.ExtractUShort(4);
-            InboundPacket? packet = this._server.GetInboundPacket(packetId);
-            packet?.Handle(transformed, this);
-        }
-    }
-
-    private byte[] HandleLayers(IReadOnlyList<INetworkLayer> layers, byte[] data) {
-        IReadOnlyList<INetworkLayer> sorted = layers.OrderBy(p => p.GetPriority()).ToList();
-
-        return sorted.Aggregate(data, (current, layer) => layer.Handle(current, this));
-    }
-
-    public void Send(OutboundPacket packet) {
-        NetworkStream stream = this._tcpClient.GetStream();
-        byte[] result = this.HandleLayers(this._server.PackageLayers, packet.Package());
-
-        byte[] final = [
-            ..(result.Length + 6).ToByteArray(), // + 6 = + 4 (length) + 2 (packet id)
-            ..packet.GetId().ToByteArray(),
-            ..result
-        ];
-
-        stream.Write(final, 0, final.Length);
     }
 }

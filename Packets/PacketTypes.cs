@@ -23,5 +23,5 @@ public abstract class OutboundPacket : Packet {
 }
 
 public abstract class InboundPacket : Packet {
-    public abstract void Handle(byte[] data, ISendableParticipant client);
+    public abstract void Handle(byte[] data, AbstractClient client);
 }

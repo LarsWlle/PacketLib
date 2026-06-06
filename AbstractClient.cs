@@ -10,17 +10,17 @@ namespace PacketLib;
 ///     based on an already created tcp client.
 ///     Also contains extra methods that manage this tcp connection.
 /// </summary>
-public abstract class AbstractClient : ISendableParticipant {
+public abstract class AbstractClient {
     private readonly TcpClient _client;
-    private readonly LayerPipeline<AbstractClient> _handleLayers;
-    private readonly LayerPipeline<AbstractClient> _packageLayers;
+    private readonly LayerPipeline _handleLayers;
+    private readonly LayerPipeline _packageLayers;
     private readonly PacketList _packetList;
     private readonly int _maxReadBufferLength;
 
     protected AbstractClient(
         TcpClient client,
-        LayerPipeline<AbstractClient> handleLayers,
-        LayerPipeline<AbstractClient> packageLayers,
+        LayerPipeline handleLayers,
+        LayerPipeline packageLayers,
         PacketList inboundPackets,
         int maxReadBufferLength
     ) {
@@ -51,7 +51,7 @@ public abstract class AbstractClient : ISendableParticipant {
                 }
 
                 ReadOnlySpan<byte> span = buffer.AsSpan(0, bytesRead);
-                byte[] transformed = this._handleLayers.Perform(span.ToArray());
+                byte[] transformed = this._handleLayers.Perform(span.ToArray(), this);
 
                 int packetLength = transformed.ExtractInt(0);
 
@@ -74,7 +74,7 @@ public abstract class AbstractClient : ISendableParticipant {
     public void Send(OutboundPacket packet) {
         NetworkStream stream = this._client.GetStream();
         byte[] data = packet.Package();
-        byte[] result = this._packageLayers.Perform(data);
+        byte[] result = this._packageLayers.Perform(data, this);
 
         byte[] final = [
             ..(result.Length + 6).ToByteArray(), // + 6 = + 4 (length) + 2 (packet id)

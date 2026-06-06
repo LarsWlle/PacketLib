@@ -2,15 +2,21 @@ using System.Net;
 using System.Net.Sockets;
 using PacketLib.Clients;
 using PacketLib.Configuration;
+using PacketLib.Layering;
 using PacketLib.Packets;
 
 namespace PacketLib;
 
-public class Server(Func<TcpClient, int, Server, BaseClient> clientFactory) : CommunicationParticipant {
+public class Server(Func<TcpClient, int, Server, BaseClient> clientFactory) {
     public Config Config { get; } = new();
     private readonly List<BaseClient> _clients = [];
 
     private int _lastClientId = 0;
+
+    public LayerPipeline HandleLayers => new();
+    public LayerPipeline PackageLayers => new();
+
+    public readonly PacketList InboundPackets = new();
 
     public void Start() {
         TcpListener listener = new(IPAddress.Any, this.Config.Port) {

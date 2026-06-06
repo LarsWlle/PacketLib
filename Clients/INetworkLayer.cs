@@ -1,7 +1,5 @@
 namespace PacketLib.Clients;
 
 public interface INetworkLayer {
-    public int GetPriority();
-
-    public byte[] Handle(byte[] data, ISendableParticipant client);
+    public byte[] Handle(byte[] data, AbstractClient client);
 }

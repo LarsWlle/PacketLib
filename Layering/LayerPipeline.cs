@@ -2,13 +2,13 @@ using PacketLib.Clients;
 
 namespace PacketLib.Layering;
 
-public class LayerPipeline<T>(T client) where T : ISendableParticipant {
+public class LayerPipeline {
     private readonly List<INetworkLayer> _layers = [];
 
-    public LayerPipeline<T> Then(INetworkLayer layer) {
+    public LayerPipeline Then(INetworkLayer layer) {
         this._layers.Add(layer);
         return this;
     }
 
-    public byte[] Perform(byte[] arr) => this._layers.Aggregate(arr, (current, layer) => layer.Handle(current, client));
+    public byte[] Perform(byte[] arr, AbstractClient client) => this._layers.Aggregate(arr, (current, layer) => layer.Handle(current, client));
 }
