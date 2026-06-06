@@ -1,4 +1,4 @@
-namespace PacketLib.Clients.Impl.Inbounds;
+namespace PacketLib.Layering.Impl.Inbounds;
 
 public class EncryptionHandleLayer : INetworkLayer {
     public int GetPriority() {

@@ -1,6 +1,4 @@
-using PacketLib.Packets;
-
-namespace PacketLib.Clients.Impl.Outbounds;
+namespace PacketLib.Layering.Impl.Outbounds;
 
 public class EncryptionPackageLayer : INetworkLayer {
     public int GetPriority() {
