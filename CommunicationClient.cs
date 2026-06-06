@@ -52,7 +52,7 @@ public class CommunicationClient : CommunicationParticipant, ISendableParticipan
     private byte[] PerformLayerActions(IReadOnlyList<INetworkLayer> layers, byte[] data) {
         IReadOnlyList<INetworkLayer> sorted = layers.OrderBy(p => p.GetPriority()).ToList();
 
-        return sorted.Aggregate(data, (current, layer) => layer.Handle(current));
+        return sorted.Aggregate(data, (current, layer) => layer.Handle(current, this));
     }
 
     public void Send(OutboundPacket packet) {

@@ -5,7 +5,7 @@ public class EncryptionHandleLayer : INetworkLayer {
         return int.MinValue;
     }
 
-    public byte[] Handle(byte[] data) {
+    public byte[] Handle(byte[] data, ISendableParticipant client) {
         return data;
     }
 }

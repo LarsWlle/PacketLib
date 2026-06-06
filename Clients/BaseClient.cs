@@ -56,7 +56,7 @@ public abstract class BaseClient : ISendableParticipant {
     private byte[] HandleLayers(IReadOnlyList<INetworkLayer> layers, byte[] data) {
         IReadOnlyList<INetworkLayer> sorted = layers.OrderBy(p => p.GetPriority()).ToList();
 
-        return sorted.Aggregate(data, (current, layer) => layer.Handle(current));
+        return sorted.Aggregate(data, (current, layer) => layer.Handle(current, this));
     }
 
     public void Send(OutboundPacket packet) {
