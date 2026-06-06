@@ -9,7 +9,7 @@ public class CommunicationClient : CommunicationParticipant, ISendableParticipan
     private TcpClient _client;
 
     public void Connect(string endpoint, int port) {
-        this._client = new(endpoint, port);
+        this._client = new TcpClient(endpoint, port);
 
         Task.Run(this.HandleIncomingTraffic);
     }
