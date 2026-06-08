@@ -1,13 +1,7 @@
 namespace PacketLib.Layering.Impl.Inbounds;
 
 public class EncryptionHandleLayer : INetworkLayer {
-    public int GetPriority() {
-        return int.MinValue;
-    }
+    public int GetPriority() => int.MinValue;
 
-    public byte[] Handle(byte[] data, AbstractClient client) {
-        if (!client.Encryption.IsHandshakeComplete) return data;
-
-        return client.Encryption.Decrypt(data);
-    }
+    public byte[] Handle(byte[] data, AbstractClient client) => client.Encryption.IsHandshakeComplete ? client.Encryption.Decrypt(data) : data;
 }
