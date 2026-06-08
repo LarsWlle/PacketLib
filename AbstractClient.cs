@@ -1,7 +1,12 @@
+#region
+
 using System.Net.Sockets;
+using PacketLib.Crypto;
 using PacketLib.Layering;
 using PacketLib.Packets;
 using PacketLib.Utils;
+
+#endregion
 
 namespace PacketLib;
 
@@ -16,6 +21,8 @@ public abstract class AbstractClient {
     private readonly LayerPipeline _packageLayers;
     private readonly PacketList _packetList;
     private readonly int _maxReadBufferLength;
+
+    public Encryption? Encryption;
 
     protected AbstractClient(
         TcpClient client,

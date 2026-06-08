@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 
 #endregion
 
-namespace PacketLib.Encryption;
+namespace PacketLib.Crypto;
 
 public class Encryption {
     public readonly byte[] PublicKey;
