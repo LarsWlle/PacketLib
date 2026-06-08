@@ -22,7 +22,7 @@ public abstract class AbstractClient {
     private readonly PacketList _packetList;
     private readonly int _maxReadBufferLength;
 
-    public Encryption? Encryption { get; private set; }
+    public Encryption Encryption { get; private set; } = new();
 
     protected AbstractClient(
         TcpClient client,

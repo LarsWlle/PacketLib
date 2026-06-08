@@ -1,9 +1,7 @@
 namespace PacketLib.Packets.Impl;
 
-public class OutboundEncryptionHandshakePacket : OutboundPacket {
+public class OutboundEncryptionHandshakePacket(AbstractClient client) : OutboundPacket {
     public override ushort GetId() => ushort.MaxValue;
 
-    public override byte[] Package() {
-        return [];
-    }
+    public override byte[] Package() => client.Encryption.PublicKey;
 }

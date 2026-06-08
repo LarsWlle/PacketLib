@@ -8,14 +8,13 @@ namespace PacketLib.Crypto;
 
 public class Encryption {
     public readonly byte[] PublicKey;
-    public readonly byte[] RemotePublicKey;
+    public byte[] RemotePublicKey { get; set; }
 
     private readonly ECDiffieHellman _ecdh;
     private readonly byte[] _sharedKey;
 
-    public Encryption(byte[] remotePublicKey) {
+    public Encryption() {
         (byte[] PublicKey, ECDiffieHellman Ecdh) key = this.GenerateKey();
-        this.RemotePublicKey = remotePublicKey;
         this.PublicKey = key.PublicKey;
         this._ecdh = key.Ecdh;
         this._sharedKey = this.DeriveSharedKey();
