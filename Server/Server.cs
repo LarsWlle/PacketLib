@@ -21,6 +21,10 @@ public class Server(Func<TcpClient, int, Server, BaseClient> clientFactory) {
 
     public Config Config { get; } = new();
 
+    public delegate void ClientConnectHandler(BaseClient client);
+
+    public event ClientConnectHandler? OnClientConnect;
+
     public void Start() {
         TcpListener listener = new(IPAddress.Any, this.Config.Port) {
             Server = {
@@ -42,6 +46,7 @@ public class Server(Func<TcpClient, int, Server, BaseClient> clientFactory) {
             Logger.Info($"Client connected, id = {id}");
             BaseClient client = clientFactory(tcpClient, id, this);
             this._clients.Add(client);
+            this.OnClientConnect?.Invoke(client);
         }
     }
 
