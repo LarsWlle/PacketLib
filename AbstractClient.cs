@@ -29,11 +29,13 @@ public abstract class AbstractClient {
         this._packageLayers = packageLayers;
         this._packetList = inboundPackets;
         this._maxReadBufferLength = maxReadBufferLength;
-        _ = new Thread(this.HandleIncomingTraffic);
+        Thread thread = new(this.HandleIncomingTraffic);
+        thread.Start();
     }
 
     private void HandleIncomingTraffic() {
         NetworkStream stream = this._client.GetStream();
+        Logger.Debug("Starting listener on new thread");
 
         while (this._client.Connected) {
             try {
@@ -62,6 +64,7 @@ public abstract class AbstractClient {
 
                 ushort packetId = transformed.ExtractUShort(4);
                 InboundPacket? packet = this._packetList.Get(packetId);
+                Logger.Info($"Received packet with {packetId}, found a valid handler!");
                 packet?.Handle(transformed, this);
             }
             catch (IOException ex) {
