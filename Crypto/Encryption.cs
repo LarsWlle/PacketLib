@@ -9,6 +9,7 @@ namespace PacketLib.Crypto;
 public class Encryption {
     public readonly byte[] PublicKey;
     public byte[] RemotePublicKey { get; set; }
+    public bool IsHandshakeComplete { get; set; } = false;
 
     private readonly ECDiffieHellman _ecdh;
     private readonly byte[] _sharedKey;

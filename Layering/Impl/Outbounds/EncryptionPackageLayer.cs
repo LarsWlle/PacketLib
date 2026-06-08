@@ -6,6 +6,7 @@ public class EncryptionPackageLayer : INetworkLayer {
     }
 
     public byte[] Handle(byte[] packet, AbstractClient client) {
+        if (!client.Encryption.IsHandshakeComplete) return packet;
         return packet;
     }
 }
