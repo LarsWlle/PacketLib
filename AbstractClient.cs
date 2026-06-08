@@ -65,15 +65,15 @@ public abstract class AbstractClient {
 
                 int packetLength = transformed.ExtractInt(0);
 
-                if (packetLength != transformed.Length) {
-                    Logger.Warn($"Packet length {packetLength} != {transformed.Length}, discarding packet!");
+                if (packetLength > transformed.Length) {
+                    Logger.Warn($"Packet length given is larger than received buffer! {packetLength} > {transformed.Length}, discarding packet!");
                     continue;
                 }
 
                 ushort packetId = transformed.ExtractUShort(4);
                 InboundPacket? packet = this._packetList.Get(packetId);
                 Logger.Info($"Received packet with {packetId}, found a valid handler!");
-                packet?.Handle(transformed.Skip(6).ToArray(), this); // 6 = 4 (length) + 2 (packet id)
+                packet?.Handle(transformed.Skip(6).Take(packetLength).ToArray(), this); // 6 = 4 (length) + 2 (packet id)
             }
             catch (IOException ex) {
                 Logger.Warn(ex.Message);
