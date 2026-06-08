@@ -6,28 +6,42 @@ using System.Security.Cryptography;
 
 namespace PacketLib.Encryption;
 
-public static class Encryption {
-    public static (byte[] PublicKey, ECDiffieHellman Ecdh) GenerateKey() {
+public class Encryption {
+    public readonly byte[] PublicKey;
+    public readonly byte[] RemotePublicKey;
+
+    private readonly ECDiffieHellman _ecdh;
+    private readonly byte[] _sharedKey;
+
+    public Encryption(byte[] remotePublicKey) {
+        (byte[] PublicKey, ECDiffieHellman Ecdh) key = this.GenerateKey();
+        this.RemotePublicKey = remotePublicKey;
+        this.PublicKey = key.PublicKey;
+        this._ecdh = key.Ecdh;
+        this._sharedKey = this.DeriveSharedKey();
+    }
+
+    private (byte[] PublicKey, ECDiffieHellman Ecdh) GenerateKey() {
         ECDiffieHellman ecdh = ECDiffieHellman.Create(ECCurve.NamedCurves.nistP256);
         return (ecdh.PublicKey.ExportSubjectPublicKeyInfo(), ecdh);
     }
 
-    public static byte[] DeriveSharedKey(ECDiffieHellman localEcdh, byte[] remotePubKeyBytes) {
+    private byte[] DeriveSharedKey() {
         using ECDiffieHellman remotePubKey = ECDiffieHellman.Create();
-        remotePubKey.ImportSubjectPublicKeyInfo(remotePubKeyBytes, out _);
-        byte[] sharedSecret = localEcdh.DeriveRawSecretAgreement(remotePubKey.PublicKey);
+        remotePubKey.ImportSubjectPublicKeyInfo(this.RemotePublicKey, out _);
+        byte[] sharedSecret = this._ecdh.DeriveRawSecretAgreement(remotePubKey.PublicKey);
 
         return HKDF.DeriveKey(HashAlgorithmName.SHA256, sharedSecret, 32, salt: null, info: "tcp-aes-key"u8.ToArray());
     }
 
-    public static byte[] Encrypt(byte[] key, byte[] plaintext) {
-        byte[] nonce = new byte[AesGcm.NonceByteSizes.MaxSize]; // 12 bytes
+    public byte[] Encrypt(byte[] plaintext) {
+        byte[] nonce = new byte[AesGcm.NonceByteSizes.MaxSize];
         RandomNumberGenerator.Fill(nonce);
 
         byte[] ciphertext = new byte[plaintext.Length];
-        byte[] tag = new byte[AesGcm.TagByteSizes.MaxSize]; // 16 bytes
+        byte[] tag = new byte[AesGcm.TagByteSizes.MaxSize];
 
-        using AesGcm aes = new AesGcm(key, tag.Length);
+        using AesGcm aes = new(this._sharedKey, tag.Length);
         aes.Encrypt(nonce, plaintext, ciphertext, tag);
 
         // Layout: [12 nonce][16 tag][n ciphertext]
@@ -38,14 +52,14 @@ public static class Encryption {
         return result;
     }
 
-    public static byte[] Decrypt(byte[] key, byte[] payload) {
-        byte[] nonce = payload[..12];
-        byte[] tag = payload[12..28];
-        byte[] ciphertext = payload[28..];
+    public byte[] Decrypt(byte[] payload) {
+        byte[] nonce = payload.Take(12).ToArray();
+        byte[] tag = payload.Skip(12).Take(16).ToArray();
+        byte[] cipher = payload.Skip(28).ToArray();
 
-        byte[] plaintext = new byte[ciphertext.Length];
-        using AesGcm aes = new(key, tag.Length);
-        aes.Decrypt(nonce, ciphertext, tag, plaintext);
+        byte[] plaintext = new byte[cipher.Length];
+        using AesGcm aes = new(this._sharedKey, tag.Length);
+        aes.Decrypt(nonce, cipher, tag, plaintext);
         return plaintext;
     }
 }
