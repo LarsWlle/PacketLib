@@ -1,3 +1,9 @@
+#region
+
+using PacketLib.Crypto;
+
+#endregion
+
 namespace PacketLib.Packets.Impl;
 
 public class InboundEncryptionHandshakePacket : InboundPacket {
@@ -18,6 +24,6 @@ public class InboundEncryptionHandshakePacket : InboundPacket {
         }
 
         client.Encryption.SetRemotePublicKey(data);
-        client.Encryption.IsHandshakeComplete = true;
+        client.Encryption.KeyExchangeStatus &= Encryption.HandshakeStatus.Received;
     }
 }

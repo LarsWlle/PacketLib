@@ -7,9 +7,17 @@ using System.Security.Cryptography;
 namespace PacketLib.Crypto;
 
 public class Encryption {
+    [Flags]
+    public enum HandshakeStatus {
+        Nothing = 0,
+        Sent = 1,
+        Received = 2,
+        Both = 3
+    }
+
     public readonly byte[] PublicKey;
     public byte[] RemotePublicKey { get; set; } = [];
-    public bool IsHandshakeComplete { get; set; } = false;
+    public HandshakeStatus KeyExchangeStatus { get; set; } = HandshakeStatus.Nothing;
 
     private readonly ECDiffieHellman _ecdh;
     private byte[] _sharedKey = [];
