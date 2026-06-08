@@ -4,8 +4,9 @@ public class InboundEncryptionHandshakePacket : InboundPacket {
     public override ushort GetId() => ushort.MaxValue;
 
     public override void Handle(byte[] data, AbstractClient client) {
-        if (data.Length != 32) {
+        if (data.Length != 91) {
             Logger.Warn("The received public key of the remote has an invalid length! Terminating connection");
+            Logger.Warn($"Got {data.Length}, expected 91");
             client.Terminate();
             return;
         }
