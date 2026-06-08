@@ -4,6 +4,7 @@ using System.Net.Sockets;
 using PacketLib.Crypto;
 using PacketLib.Layering;
 using PacketLib.Packets;
+using PacketLib.Packets.Impl;
 using PacketLib.Utils;
 
 #endregion
@@ -100,5 +101,9 @@ public abstract class AbstractClient {
         stream.Flush();
         stream.Close();
         this._client.Close(); // Should close the thread
+    }
+
+    public void StartEncryptionHandshake() {
+        this.Send(new OutboundEncryptionHandshakePacket(this));
     }
 }
