@@ -1,7 +1,7 @@
 namespace PacketLib.Packets;
 
 public class PacketList {
-    private Dictionary<int, InboundPacket> _packets = [];
+    private readonly Dictionary<int, InboundPacket> _packets = [];
 
     public PacketList Add(InboundPacket packet) {
         if (this._packets.ContainsKey(packet.GetId())) {
@@ -12,6 +12,10 @@ public class PacketList {
         Logger.Debug($"Registered new packet[id={packet.GetId()},name\"{packet.GetType().Name}\"]");
 
         return this;
+    }
+
+    public bool Contains(int id) {
+        return this._packets.ContainsKey(id);
     }
 
     public InboundPacket? Get(int id) {

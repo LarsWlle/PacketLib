@@ -104,6 +104,9 @@ public abstract class AbstractClient {
     }
 
     public void StartEncryptionHandshake() {
+        InboundEncryptionHandshakePacket packet = new();
+        if (!this._packetList.Contains(packet.GetId())) this._packetList.Add(packet);
+
         this.Send(new OutboundEncryptionHandshakePacket(this));
     }
 }
