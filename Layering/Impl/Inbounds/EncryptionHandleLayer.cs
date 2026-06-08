@@ -7,6 +7,7 @@ public class EncryptionHandleLayer : INetworkLayer {
 
     public byte[] Handle(byte[] data, AbstractClient client) {
         if (!client.Encryption.IsHandshakeComplete) return data;
-        return data;
+
+        return client.Encryption.Decrypt(data);
     }
 }
