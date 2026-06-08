@@ -16,7 +16,7 @@ public class InboundEncryptionHandshakePacket : InboundPacket {
             return;
         }
 
-        client.Encryption.RemotePublicKey = data;
+        client.Encryption.SetRemotePublicKey(data);
         client.Encryption.IsHandshakeComplete = true;
     }
 }
