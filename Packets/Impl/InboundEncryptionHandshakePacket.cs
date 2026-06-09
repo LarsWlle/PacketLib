@@ -6,7 +6,7 @@ using PacketLib.Crypto;
 
 namespace PacketLib.Packets.Impl;
 
-public class InboundEncryptionHandshakePacket : InboundPacket {
+internal class InboundEncryptionHandshakePacket : InboundPacket {
     public override ushort GetId() => ushort.MaxValue;
 
     public override void Handle(byte[] data, AbstractClient client) {
@@ -25,9 +25,5 @@ public class InboundEncryptionHandshakePacket : InboundPacket {
 
         client.Encryption.SetRemotePublicKey(data);
         client.Encryption.KeyExchangeStatus |= Encryption.HandshakeStatus.Received;
-
-        if (client.Encryption.KeyExchangeStatus != Encryption.HandshakeStatus.Sent) {
-            client.Send(new OutboundEncryptionHandshakePacket(client));
-        }
     }
 }

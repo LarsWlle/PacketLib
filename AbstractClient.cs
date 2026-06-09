@@ -23,7 +23,7 @@ public abstract class AbstractClient {
     private readonly PacketList _packetList;
     private readonly int _maxReadBufferLength;
 
-    public Encryption Encryption { get; private set; } = new();
+    public Encryption Encryption { get; } = new();
 
     protected AbstractClient(
         TcpClient client,
@@ -103,10 +103,17 @@ public abstract class AbstractClient {
         this._client.Close(); // Should close the thread
     }
 
+    public void EnableEncryption() {
+        this._packetList.Add(new InboundEncryptionHandshakePacket());
+    }
+
     public void StartEncryptionHandshake() {
         InboundEncryptionHandshakePacket packet = new();
         if (!this._packetList.Contains(packet.GetId())) this._packetList.Add(packet);
 
+        if ((this.Encryption.KeyExchangeStatus & Encryption.HandshakeStatus.Sent) != 0) return;
+
         this.Send(new OutboundEncryptionHandshakePacket(this));
+        this.Encryption.KeyExchangeStatus |= Encryption.HandshakeStatus.Sent;
     }
 }

@@ -12,7 +12,7 @@ public class Encryption {
         Nothing = 0,
         Sent = 1,
         Received = 2,
-        Both = 3
+        Both = HandshakeStatus.Sent | HandshakeStatus.Received
     }
 
     public readonly byte[] PublicKey;
