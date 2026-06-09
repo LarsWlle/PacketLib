@@ -17,15 +17,28 @@ public class Encryption {
 
     public readonly byte[] PublicKey;
     public byte[] RemotePublicKey { get; set; } = [];
-    public HandshakeStatus KeyExchangeStatus { get; set; } = HandshakeStatus.Nothing;
+
+    private HandshakeStatus _keyExchangeStatus = HandshakeStatus.Nothing;
+
+    public HandshakeStatus KeyExchangeStatus {
+        get => this._keyExchangeStatus;
+        set {
+            if (value == HandshakeStatus.Both)
+                this._client.TriggerEncryptionHandshakeComplete();
+
+            this._keyExchangeStatus = value;
+        }
+    }
 
     private readonly ECDiffieHellman _ecdh;
     private byte[] _sharedKey = [];
+    private readonly AbstractClient _client;
 
-    public Encryption() {
+    public Encryption(AbstractClient client) {
         (byte[] PublicKey, ECDiffieHellman Ecdh) key = this.GenerateKey();
         this.PublicKey = key.PublicKey;
         this._ecdh = key.Ecdh;
+        this._client = client;
     }
 
     public void SetRemotePublicKey(byte[] publicKey) {
@@ -65,7 +78,12 @@ public class Encryption {
     }
 
     public byte[] Decrypt(byte[] payload) {
-        if (payload.Length == 0) return payload;
+        switch (payload.Length) {
+            case 0: return payload;
+            case < 28:
+                Logger.Warn("Tried to decrypt payload but length is smaller than 28!");
+                return payload;
+        }
 
         byte[] nonce = payload.Take(12).ToArray();
         byte[] tag = payload.Skip(12).Take(16).ToArray();

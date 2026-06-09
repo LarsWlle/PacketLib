@@ -25,5 +25,10 @@ internal class InboundEncryptionHandshakePacket : InboundPacket {
 
         client.Encryption.SetRemotePublicKey(data);
         client.Encryption.KeyExchangeStatus |= Encryption.HandshakeStatus.Received;
+
+        if ((client.Encryption.KeyExchangeStatus & Encryption.HandshakeStatus.Sent) == 0) {
+            client.Send(new OutboundEncryptionHandshakePacket(client));
+            client.Encryption.KeyExchangeStatus |= Encryption.HandshakeStatus.Sent;
+        }
     }
 }

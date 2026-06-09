@@ -16,7 +16,7 @@ namespace PacketLib;
 ///     based on an already created tcp client.
 ///     Also contains extra methods that manage this tcp connection.
 /// </summary>
-public abstract class AbstractClient {
+public abstract partial class AbstractClient {
     private readonly TcpClient _client;
     private readonly LayerPipeline _handleLayers;
     private readonly LayerPipeline _packageLayers;
@@ -25,7 +25,7 @@ public abstract class AbstractClient {
 
     private const int HeaderLength = 6; // 4 (length) + 2 (packet id)
 
-    public Encryption Encryption { get; } = new();
+    public Encryption Encryption { get; }
 
     protected AbstractClient(
         TcpClient client,
@@ -38,6 +38,7 @@ public abstract class AbstractClient {
         this._handleLayers = handleLayers;
         this._packageLayers = packageLayers;
         this._packetList = inboundPackets;
+        this.Encryption = new Encryption(this);
         this._maxReadBufferLength = maxReadBufferLength;
         Thread thread = new(this.HandleIncomingTraffic);
         thread.Start();
