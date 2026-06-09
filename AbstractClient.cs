@@ -23,6 +23,8 @@ public abstract class AbstractClient {
     private readonly PacketList _packetList;
     private readonly int _maxReadBufferLength;
 
+    private const int HeaderLength = 6; // 4 (length) + 2 (packet id)
+
     public Encryption Encryption { get; } = new();
 
     protected AbstractClient(
@@ -73,7 +75,10 @@ public abstract class AbstractClient {
                 ushort packetId = transformed.ExtractUShort(4);
                 InboundPacket? packet = this._packetList.Get(packetId);
                 Logger.Info($"Received packet with {packetId}, found a valid handler!");
-                packet?.Handle(transformed.Skip(6).Take(packetLength - 6).ToArray(), this); // 6 = 4 (length) + 2 (packet id)
+
+                byte[] toPassOn = transformed.Skip(AbstractClient.HeaderLength).Take(packetLength - AbstractClient.HeaderLength).ToArray();
+
+                packet?.Handle(toPassOn, this);
             }
             catch (IOException ex) {
                 Logger.Warn(ex.Message);

@@ -65,6 +65,8 @@ public class Encryption {
     }
 
     public byte[] Decrypt(byte[] payload) {
+        if (payload.Length == 0) return payload;
+
         byte[] nonce = payload.Take(12).ToArray();
         byte[] tag = payload.Skip(12).Take(16).ToArray();
         byte[] cipher = payload.Skip(28).ToArray();
