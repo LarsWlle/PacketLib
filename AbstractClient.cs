@@ -21,7 +21,6 @@ public abstract partial class AbstractClient {
     private readonly LayerPipeline _handleLayers;
     private readonly LayerPipeline _packageLayers;
     private readonly PacketList _packetList;
-    private readonly int _maxReadBufferLength;
 
     private const int HeaderLength = 6; // 4 (length) + 2 (packet id)
 
@@ -31,53 +30,40 @@ public abstract partial class AbstractClient {
         TcpClient client,
         LayerPipeline handleLayers,
         LayerPipeline packageLayers,
-        PacketList inboundPackets,
-        int maxReadBufferLength
+        PacketList inboundPackets
     ) {
         this._client = client;
         this._handleLayers = handleLayers;
         this._packageLayers = packageLayers;
         this._packetList = inboundPackets;
         this.Encryption = new Encryption(this);
-        this._maxReadBufferLength = maxReadBufferLength;
-        Thread thread = new(this.HandleIncomingTraffic);
-        thread.Start();
+        Task.Run(this.HandleIncomingTraffic);
     }
 
-    private void HandleIncomingTraffic() {
+    private async Task HandleIncomingTraffic() {
         NetworkStream stream = this._client.GetStream();
         Logger.Debug("Starting listener on new thread");
 
         while (this._client.Connected) {
             try {
-                if (!stream.CanRead || !stream.DataAvailable) {
-                    Thread.Sleep(10);
-                    continue;
-                }
+                byte[] header = new byte[AbstractClient.HeaderLength];
+                await stream.ReadExactlyAsync(header, 0, header.Length);
 
-                byte[] buffer = new byte[this._maxReadBufferLength];
-                int bytesRead = stream.Read(buffer, 0, buffer.Length);
+                int length = header.ExtractInt(0);
+                ushort packetId = header.ExtractUShort(4);
 
-                if (bytesRead == 0) {
-                    Logger.Warn("Data was available but read 0 bytes, something is going on!");
-                    continue;
-                }
+                byte[] payload = new byte[length];
+                await stream.ReadExactlyAsync(payload, 0, payload.Length);
 
-                ReadOnlySpan<byte> span = buffer.AsSpan(0, bytesRead);
-                byte[] transformed = this._handleLayers.Perform(span.ToArray(), this);
+                byte[] transformed = this._handleLayers.Perform(payload, this);
 
-                int packetLength = transformed.ExtractInt(0);
-
-                if (packetLength > transformed.Length) {
-                    Logger.Warn($"Packet length given is larger than received buffer! {packetLength} > {transformed.Length}, discarding packet!");
-                    continue;
-                }
-
-                ushort packetId = transformed.ExtractUShort(4);
                 InboundPacket? packet = this._packetList.Get(packetId);
                 Logger.Info($"Received packet with {packetId}, found a valid handler!");
 
-                byte[] toPassOn = transformed.Skip(AbstractClient.HeaderLength).Take(packetLength - AbstractClient.HeaderLength).ToArray();
+                byte[] toPassOn = transformed
+                    .Skip(AbstractClient.HeaderLength)
+                    .Take(length - AbstractClient.HeaderLength)
+                    .ToArray();
 
                 packet?.Handle(toPassOn, this);
             }
@@ -94,7 +80,7 @@ public abstract partial class AbstractClient {
         byte[] result = this._packageLayers.Perform(data, this);
 
         byte[] final = [
-            ..(result.Length + 6).ToByteArray(), // + 6 = + 4 (length) + 2 (packet id)
+            ..result.Length.ToByteArray(),
             ..packet.GetId().ToByteArray(),
             ..result
         ];

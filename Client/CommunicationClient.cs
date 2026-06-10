@@ -1,6 +1,10 @@
+#region
+
 using System.Net.Sockets;
 using PacketLib.Layering;
 using PacketLib.Packets;
+
+#endregion
 
 namespace PacketLib.Client;
 
@@ -9,6 +13,5 @@ public class CommunicationClient(
     int port,
     LayerPipeline handleLayers,
     LayerPipeline packageLayers,
-    PacketList inboundPackets,
-    int maxReadBufferLength
-) : AbstractClient(new TcpClient(endpoint, port), handleLayers, packageLayers, inboundPackets, maxReadBufferLength);
+    PacketList inboundPackets
+) : AbstractClient(new TcpClient(endpoint, port), handleLayers, packageLayers, inboundPackets);

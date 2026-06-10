@@ -18,17 +18,15 @@ public class Encryption {
     public readonly byte[] PublicKey;
     public byte[] RemotePublicKey { get; set; } = [];
 
-    private HandshakeStatus _keyExchangeStatus = HandshakeStatus.Nothing;
-
     public HandshakeStatus KeyExchangeStatus {
-        get => this._keyExchangeStatus;
+        get;
         set {
+            field = value;
+
             if (value == HandshakeStatus.Both)
                 this._client.TriggerEncryptionHandshakeComplete();
-
-            this._keyExchangeStatus = value;
         }
-    }
+    } = HandshakeStatus.Nothing;
 
     private readonly ECDiffieHellman _ecdh;
     private byte[] _sharedKey = [];
@@ -44,6 +42,7 @@ public class Encryption {
     public void SetRemotePublicKey(byte[] publicKey) {
         this.RemotePublicKey = publicKey;
         this._sharedKey = this.DeriveSharedKey();
+        Logger.Debug($"Shared key: [{string.Join(", ", this._sharedKey)}]");
     }
 
     private (byte[] PublicKey, ECDiffieHellman Ecdh) GenerateKey() {
