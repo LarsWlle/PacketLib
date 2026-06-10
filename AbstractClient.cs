@@ -60,12 +60,7 @@ public abstract partial class AbstractClient {
                 InboundPacket? packet = this._packetList.Get(packetId);
                 Logger.Info($"Received packet with {packetId}, found a valid handler!");
 
-                byte[] toPassOn = transformed
-                    .Skip(AbstractClient.HeaderLength)
-                    .Take(length - AbstractClient.HeaderLength)
-                    .ToArray();
-
-                packet?.Handle(toPassOn, this);
+                packet?.Handle(transformed.ToArray(), this);
             }
             catch (IOException ex) {
                 Logger.Warn(ex.Message);
